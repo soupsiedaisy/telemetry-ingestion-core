@@ -1,6 +1,0 @@
-@TelemetryIngestionCore.Api_HostAddress = http://localhost:0
-
-GET {{TelemetryIngestionCore.Api_HostAddress}}/hello/
-Accept: application/json
-
-###

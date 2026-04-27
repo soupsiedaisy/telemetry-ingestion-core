@@ -1,16 +1,10 @@
-namespace TelemetryIngestionCore.Api
+namespace TelemetryIngestionCore.Api;
+
+internal static class Program
 {
-    internal static class Program
-    {
-        private static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+    private static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
 
-            var app = builder.Build();
-
-            app.MapGet("/", () => "Hello World!").WithName("HelloWorld");
-
-            app.Run();
-        }
-    }
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
 }
