@@ -20,11 +20,11 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Change directory
-      run: cd server/src/TelemetryIngestionCore.Api
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
+    - name: Restore dependencies and build
+      working-directory: ./server/src/TelemetryIngestionCore.Api
+      run: |
+        dotnet restore
+        dotnet build --no-restore
     - name: Test
+      working-directory: ./server/src/TelemetryIngestionCore.Tests
       run: dotnet test --no-build --verbosity normal
