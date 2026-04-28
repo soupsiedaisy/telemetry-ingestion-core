@@ -1,11 +1,13 @@
+using TelemetryIngestionCore.Api.Configuration;
 using TelemetryIngestionCore.Api.Endpoints;
 
 namespace TelemetryIngestionCore.Api;
 
-public class Startup
+public class Startup(IConfiguration configuration)
 {
     public void ConfigureServices(IServiceCollection services) =>
         services
+            .Configure<AppOptions>(configuration.GetSection("AppOptions"))
             .AddEndpointsApiExplorer()
             .AddSwaggerGen();
 
