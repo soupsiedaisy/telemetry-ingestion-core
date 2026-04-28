@@ -1,6 +1,7 @@
 using TelemetryIngestionCore.Api.Configuration;
 using TelemetryIngestionCore.Api.Data;
 using TelemetryIngestionCore.Api.Endpoints;
+using TelemetryIngestionCore.Api.Services;
 
 namespace TelemetryIngestionCore.Api;
 
@@ -10,6 +11,7 @@ public class Startup(IConfiguration configuration)
         services
             .Configure<AppOptions>(configuration.GetSection("AppOptions"))
             .AddDbContext<TelemetryContext>()
+            .AddScoped<IHealthService, HealthService>()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen();
 
