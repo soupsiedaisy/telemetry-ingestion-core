@@ -27,4 +27,14 @@ jobs:
         dotnet build --no-restore
     - name: Test
       working-directory: ./server/src/TelemetryIngestionCore.Tests
-      run: dotnet test --no-build --verbosity normal
+      run: |
+        dotnet restore
+        dotnet build
+        dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" --results-directory TestResults
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: 'Test Results'
+        path: 'TestResults/*.trx'
+        reporter: dotnet-trx
