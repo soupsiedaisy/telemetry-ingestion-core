@@ -57,6 +57,9 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
+# SQLite database file
+*.db
+
 # ---> Node
 # Logs
 logs

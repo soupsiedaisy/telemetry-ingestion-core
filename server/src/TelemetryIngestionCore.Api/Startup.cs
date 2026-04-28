@@ -1,4 +1,5 @@
 using TelemetryIngestionCore.Api.Configuration;
+using TelemetryIngestionCore.Api.Data;
 using TelemetryIngestionCore.Api.Endpoints;
 
 namespace TelemetryIngestionCore.Api;
@@ -8,6 +9,7 @@ public class Startup(IConfiguration configuration)
     public void ConfigureServices(IServiceCollection services) =>
         services
             .Configure<AppOptions>(configuration.GetSection("AppOptions"))
+            .AddDbContext<TelemetryContext>()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen();
 
