@@ -12,6 +12,7 @@ public class Startup(IConfiguration configuration)
             .Configure<AppOptions>(configuration.GetSection("AppOptions"))
             .AddDbContext<TelemetryContext>()
             .AddScoped<ITelemetryRepository, TelemetryRepository>()
+            .AddScoped<ITelemetryService, TelemetryService>()
             .AddScoped<IHealthService, HealthService>()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen();
@@ -24,6 +25,6 @@ public class Startup(IConfiguration configuration)
         }
 
         app.UseRouting();
-        app.UseEndpoints(endpoints => endpoints.MapHealthEndpoints());
+        app.UseEndpoints(endpoints => endpoints.MapHealthEndpoints().MapTelemetryEndpoints());
     }
 }
