@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using Microsoft.Extensions.Options;
 using TelemetryIngestionCore.Api.Configuration;
 using TelemetryIngestionCore.Api.Data;
@@ -87,7 +88,13 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
             Battery = r.Battery,
             BatteryLow = r.Battery <= batteryLowThreshold,
             Signal = r.Signal,
-            RecordedAt = r.RecordedAt.ToString(),
-            CreatedAt = r.CreatedAt.ToString(),
+            RecordedAt = r.RecordedAt.ToString(
+                "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fff'Z'",
+                CultureInfo.InvariantCulture
+            ),
+            CreatedAt = r.CreatedAt.ToString(
+                "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fff'Z'",
+                CultureInfo.InvariantCulture
+            ),
         };
 }
