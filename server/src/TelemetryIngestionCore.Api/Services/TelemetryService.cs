@@ -27,21 +27,8 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
             throw new ArgumentNullException(nameof(dto));
 
         var validationContext = new ValidationContext(dto);
-        var validationResults = new List<ValidationResult>();
 
-        if (
-            !Validator.TryValidateObject(
-                dto,
-                validationContext,
-                validationResults,
-                validateAllProperties: true
-            )
-        )
-        {
-            var errors = string.Join("; ", validationResults.Select(r => r.ErrorMessage));
-
-            throw new ArgumentException($"TelemetryDto validation failed: {errors}");
-        }
+        Validator.ValidateObject(dto, validationContext);
 
         var reading = new TelemetryReading
         {
