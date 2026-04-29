@@ -8,19 +8,19 @@ public class DuplicateExternalIdException : Exception
 
     public DuplicateExternalIdException(
         string tenantId,
-        string externalId,
+        string? externalId,
         Guid? existingId = null
     )
         : base($"A reading with ExternalId '{externalId}' already exists for tenant '{tenantId}'.")
     {
         TenantId = tenantId;
-        ExternalId = externalId;
+        ExternalId = externalId ?? "";
         ExistingId = existingId;
     }
 
     public DuplicateExternalIdException(
         string tenantId,
-        string externalId,
+        string? externalId,
         Guid? existingId,
         Exception inner
     )
@@ -30,7 +30,7 @@ public class DuplicateExternalIdException : Exception
         )
     {
         TenantId = tenantId;
-        ExternalId = externalId;
+        ExternalId = externalId ?? "";
         ExistingId = existingId;
     }
 }
