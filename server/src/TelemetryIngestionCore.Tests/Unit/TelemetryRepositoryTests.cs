@@ -156,7 +156,7 @@ public class TelemetryRepositoryTests : IDisposable
 
         var repo = CreateRepository(context);
 
-        var now = DateTimeOffset.FromUnixTimeSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+        var now = DateTimeOffset.FromUnixTimeMilliseconds(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
 
         var readings = new[]
         {

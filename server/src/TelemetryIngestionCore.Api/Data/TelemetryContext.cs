@@ -41,16 +41,16 @@ public class TelemetryContext(
             builder
                 .Property(e => e.RecordedAt)
                 .HasConversion(
-                    date => date.ToUnixTimeSeconds(),
-                    time => DateTimeOffset.FromUnixTimeSeconds(time)
+                    date => date.ToUnixTimeMilliseconds(),
+                    time => DateTimeOffset.FromUnixTimeMilliseconds(time)
                 )
                 .IsRequired();
 
             builder
                 .Property(e => e.CreatedAt)
                 .HasConversion(
-                    date => date.ToUnixTimeSeconds(),
-                    time => DateTimeOffset.FromUnixTimeSeconds(time)
+                    date => date.ToUnixTimeMilliseconds(),
+                    time => DateTimeOffset.FromUnixTimeMilliseconds(time)
                 )
                 .IsRequired();
 
