@@ -11,6 +11,7 @@ public class Startup(IConfiguration configuration)
         services
             .Configure<AppOptions>(configuration.GetSection("AppOptions"))
             .AddDbContext<TelemetryContext>()
+            .AddScoped<ITelemetryRepository, TelemetryRepository>()
             .AddScoped<IHealthService, HealthService>()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen();
