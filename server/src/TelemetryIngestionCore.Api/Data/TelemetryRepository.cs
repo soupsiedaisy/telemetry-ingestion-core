@@ -20,7 +20,10 @@ public class TelemetryRepository(TelemetryContext context, IOptions<AppOptions> 
         var existing = await context
             .TelemetryReadings.AsNoTracking()
             .FirstOrDefaultAsync(
-                r => r.TenantId == reading.TenantId && r.ExternalId == reading.ExternalId,
+                r =>
+                    r.TenantId == reading.TenantId
+                    && !string.IsNullOrWhiteSpace(r.ExternalId)
+                    && r.ExternalId == reading.ExternalId,
                 ct
             )
             .ConfigureAwait(false);
