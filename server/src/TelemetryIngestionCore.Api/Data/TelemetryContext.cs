@@ -38,9 +38,21 @@ public class TelemetryContext(
             builder.Property(e => e.Battery).IsRequired();
             builder.Property(e => e.Signal).IsRequired();
 
-            builder.Property(e => e.RecordedAt).IsRequired();
+            builder
+                .Property(e => e.RecordedAt)
+                .HasConversion(
+                    date => date.ToUnixTimeSeconds(),
+                    time => DateTimeOffset.FromUnixTimeSeconds(time)
+                )
+                .IsRequired();
 
-            builder.Property(e => e.CreatedAt).IsRequired();
+            builder
+                .Property(e => e.CreatedAt)
+                .HasConversion(
+                    date => date.ToUnixTimeSeconds(),
+                    time => DateTimeOffset.FromUnixTimeSeconds(time)
+                )
+                .IsRequired();
 
             // Indexes to optimize common queries
             builder.HasIndex(e => e.TenantId);

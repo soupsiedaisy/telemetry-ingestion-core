@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TelemetryIngestionCore.Api.Data;
 
@@ -10,9 +11,11 @@ using TelemetryIngestionCore.Api.Data;
 namespace TelemetryIngestionCore.Api.Migrations
 {
     [DbContext(typeof(TelemetryContext))]
-    partial class TelemetryContextModelSnapshot : ModelSnapshot
+    [Migration("20260429120934_DateTimeOffsetConversion")]
+    partial class DateTimeOffsetConversion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.26");
