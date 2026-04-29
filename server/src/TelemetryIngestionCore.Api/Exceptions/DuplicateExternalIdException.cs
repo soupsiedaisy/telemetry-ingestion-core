@@ -3,12 +3,12 @@ namespace TelemetryIngestionCore.Api.Exceptions;
 public class DuplicateExternalIdException : Exception
 {
     public string TenantId { get; }
-    public string? ExternalId { get; }
+    public string ExternalId { get; }
     public Guid? ExistingId { get; }
 
     public DuplicateExternalIdException(
         string tenantId,
-        string? externalId,
+        string externalId,
         Guid? existingId = null
     )
         : base($"A reading with ExternalId '{externalId}' already exists for tenant '{tenantId}'.")
@@ -20,7 +20,7 @@ public class DuplicateExternalIdException : Exception
 
     public DuplicateExternalIdException(
         string tenantId,
-        string? externalId,
+        string externalId,
         Guid? existingId,
         Exception inner
     )
