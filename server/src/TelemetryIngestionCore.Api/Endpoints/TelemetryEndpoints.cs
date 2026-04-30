@@ -5,7 +5,16 @@ using TelemetryIngestionCore.Api.Services;
 
 namespace TelemetryIngestionCore.Api.Endpoints;
 
-public static class TelemetryEndpoints {
+/// <summary>
+/// Static class used to map the telemetry endpoints for the application.
+/// </summary>
+public static class TelemetryEndpoints
+{
+    /// <summary>
+    /// Extends IEndpointRouteBuilder instances with this method to map the telemetry endpoints for the application.
+    /// </summary>
+    /// <returns>The IEndpointRouteBuilder used for defining route building contracts.</returns>
+    /// <param name="builder">The IEndpointRouteBuilder used for defining route building contracts.</param>
     public static IEndpointRouteBuilder MapTelemetryEndpoints(this IEndpointRouteBuilder builder)
     {
         builder

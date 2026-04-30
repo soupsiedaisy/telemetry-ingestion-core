@@ -3,6 +3,7 @@ using TelemetryIngestionCore.Api.Data;
 
 namespace TelemetryIngestionCore.Api.Services;
 
+/// <inheritdoc cref="IHealthService"></inheritdoc>
 public class HealthService(TelemetryContext context) : IHealthService
 {
     public bool CheckDb()

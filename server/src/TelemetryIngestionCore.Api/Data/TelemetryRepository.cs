@@ -6,9 +6,15 @@ using TelemetryIngestionCore.Api.Models;
 
 namespace TelemetryIngestionCore.Api.Data;
 
+/// <param name="context">The TelemetryContext injected by the program.</param>
+/// <param name="options">The IOptions app options injected by the program.</param>
+/// <inheritdoc cref="ITelemetryRepository" />
 public class TelemetryRepository(TelemetryContext context, IOptions<AppOptions> options)
     : ITelemetryRepository
 {
+    /// <exception cref="ArgumentNullException">The exception thrown when the method is passed a null TelemetryReading.</exception>
+    /// <exception cref="DuplicateExternalIdException">The exception thrown when a TelemetryReading with same TenantId and ExternalId is found.</exception>
+    /// <inheritdoc cref="ITelemetryRepository.CreateAsync(TelemetryReading, CancellationToken)" />
     public async Task<TelemetryReading> CreateAsync(
         TelemetryReading reading,
         CancellationToken ct = default
@@ -50,6 +56,7 @@ public class TelemetryRepository(TelemetryContext context, IOptions<AppOptions> 
         return reading;
     }
 
+    /// <inheritdoc cref="ITelemetryRepository.QueryAsync(string?, string?, string?, DateTimeOffset?, DateTimeOffset?, int?, int?, CancellationToken)" />
     public async Task<IReadOnlyList<TelemetryReading>> QueryAsync(
         string? tenantId = null,
         string? deviceId = null,
