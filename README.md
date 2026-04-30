@@ -31,7 +31,10 @@ Small vertical slice of a telemetry pipeline using SQLite + .NET 8 + GitHub Acti
 Clone the repo and install dependencies:
 
 ```bash
+# clone from codeberg
 git clone https://codeberg.org/wildflowersoup/telemetry-ingestion-core.git
+# or clone from github
+git clone https://github.com/soupsiedaisy/telemetry-ingestion-core.git
 cd telemetry-ingestion-core
 cd server/src/TelemetryIngestionCore.Api
 dotnet restore
