@@ -1,6 +1,5 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using TelemetryIngestionCore.Api.Configuration;
 using TelemetryIngestionCore.Api.Data;
@@ -12,8 +11,6 @@ namespace TelemetryIngestionCore.Tests.Unit;
 
 public class TelemetryRepositoryTests : IDisposable
 {
-    private readonly IConfiguration _configuration = new ConfigurationBuilder().Build();
-
     private readonly SqliteConnection _connection;
     private readonly DbContextOptions<TelemetryContext> _contextOptions;
 
@@ -24,7 +21,7 @@ public class TelemetryRepositoryTests : IDisposable
 
         _contextOptions = new DbContextOptionsBuilder<TelemetryContext>().Options;
 
-        using var ctx = new TestTelemetryContext(_connection, _configuration, _contextOptions);
+        using var ctx = new TestTelemetryContext(_connection, _contextOptions);
 
         ctx.Database.EnsureDeleted();
         ctx.Database.EnsureCreated();
@@ -37,7 +34,7 @@ public class TelemetryRepositoryTests : IDisposable
     }
 
     private TelemetryContext CreateContext() =>
-        new TestTelemetryContext(_connection, _configuration, _contextOptions);
+        new TestTelemetryContext(_connection, _contextOptions);
 
     private TelemetryRepository CreateRepository(TelemetryContext context, AppOptions options) =>
         new(context, Options.Create(options));

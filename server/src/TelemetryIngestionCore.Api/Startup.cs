@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TelemetryIngestionCore.Api.Configuration;
 using TelemetryIngestionCore.Api.Data;
 using TelemetryIngestionCore.Api.Endpoints;
@@ -18,7 +19,11 @@ public class Startup(IConfiguration configuration)
     public void ConfigureServices(IServiceCollection services) =>
         services
             .Configure<AppOptions>(configuration.GetSection("AppOptions"))
-            .AddDbContext<TelemetryContext>()
+            .AddDbContext<TelemetryContext>(options =>
+                options.UseSqlite(
+                    configuration.GetConnectionString("TelemetryDb") ?? "Data source=:memory:"
+                )
+            )
             .AddScoped<ITelemetryRepository, TelemetryRepository>()
             .AddScoped<ITelemetryService, TelemetryService>()
             .AddScoped<IHealthService, HealthService>()

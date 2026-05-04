@@ -1,4 +1,3 @@
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using TelemetryIngestionCore.Api.Models;
 
@@ -7,23 +6,13 @@ namespace TelemetryIngestionCore.Api.Data;
 /// <summary>
 /// The DbContext used by EntityFramework to interact with the database.
 /// </summary>
-/// <param name="configuration">The IConfiguration injected by the program.</param>
 /// <param name="options">The DbContextOptions injected by the program.</param>
-public class TelemetryContext(
-    IConfiguration configuration,
-    DbContextOptions<TelemetryContext> options
-) : DbContext(options)
+public class TelemetryContext(DbContextOptions<TelemetryContext> options) : DbContext(options)
 {
     /// <summary>
     /// The DbSet used by EntityFramework to track the TelemetryReading entries in the database.
     /// </summary>
     public DbSet<TelemetryReading> TelemetryReadings { get; set; }
-
-    /// <summary>
-    /// The connection string used to connect to the database.
-    /// </summary>
-    public string ConnectionString { get; } =
-        configuration.GetConnectionString("TelemetryDb") ?? "";
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -78,12 +67,5 @@ public class TelemetryContext(
                 .HasIndex(e => new { e.TenantId, e.ExternalId })
                 .HasDatabaseName("IX_TelemetryReadings_TenantId_ExternalId ");
         });
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var connection = new SqliteConnection(ConnectionString);
-
-        optionsBuilder.UseSqlite(connection);
     }
 }
