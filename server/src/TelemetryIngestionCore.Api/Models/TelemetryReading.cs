@@ -34,7 +34,6 @@ public class TelemetryReading
 
     /// <summary>
     /// Numeric measurement value for the reading.
-    /// Required.
     /// </summary>
     public double Value { get; set; }
 
