@@ -43,9 +43,9 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
         if (dto == null)
             throw new ArgumentNullException(nameof(dto));
 
-        var validationContext = new ValidationContext(dto);
+        var validationContext = new ValidationContext(dto, serviceProvider: null, items: null);
 
-        Validator.ValidateObject(dto, validationContext);
+        Validator.ValidateObject(dto, validationContext, validateAllProperties: true);
 
         var reading = new TelemetryReading
         {
