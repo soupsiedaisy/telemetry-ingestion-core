@@ -2,10 +2,10 @@
 
 Small vertical slice of a telemetry pipeline using SQLite + .NET 8 + GitHub Actions (and potentially a React TypeScript frontend)
 
-**Filename**: README.md
-**Author**: Willa Charlotte Lyle
-**Date**: 29 April 2026
-**Stack**: .NET 8, ASP.NET Core, EF Core (SQLite), xUnit, GitHub Actions
+- **Filename**: README.md
+- **Author**: Willa Charlotte Lyle
+- **Date**: 29 April 2026
+- **Stack**: .NET 8, ASP.NET Core, EF Core (SQLite), xUnit, GitHub Actions
 
 ## Requirements
 
