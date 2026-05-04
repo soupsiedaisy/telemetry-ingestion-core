@@ -1,13 +1,24 @@
 using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 using TelemetryIngestionCore.Api;
+using TelemetryIngestionCore.Api.Data;
 using TelemetryIngestionCore.Tests.Factories;
 
 namespace TelemetryIngestionCore.Tests.Integration;
 
-public class HealthEndpointsTests(TelemetryWebApplicationFactory<Startup> factory)
-    : IClassFixture<TelemetryWebApplicationFactory<Startup>>
+public class HealthEndpointsTests : IClassFixture<TelemetryWebApplicationFactory<Startup>>
 {
-    private readonly HttpClient _client = factory.CreateClient();
+    private readonly HttpClient _client;
+    private readonly TelemetryContext _context;
+    private readonly IServiceScope _scope;
+
+    public HealthEndpointsTests(TelemetryWebApplicationFactory<Startup> factory)
+    {
+        _client = factory.CreateDefaultClient();
+        _scope = factory.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        _context = _scope.ServiceProvider.GetRequiredService<TelemetryContext>();
+        _context.Database.EnsureCreated();
+    }
 
     [Fact]
     public async Task LiveEndpoint_ReturnsOk()
