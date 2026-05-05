@@ -290,6 +290,7 @@ The application uses the following internal services:
   - Structured JSON logs with JSON serialization
   - Include fields: tenantId, deviceId, externalId (if present), and any other fields related to the log.
   - Log levels: Information for successful ingests and queries, Warning for validation problems and Error for exceptions.
+  - Logs are routed to Console for development, and in production can route to a logging collector.
 
 #### Tests (xUnit)
 
