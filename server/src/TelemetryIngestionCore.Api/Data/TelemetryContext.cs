@@ -55,14 +55,10 @@ public class TelemetryContext(DbContextOptions<TelemetryContext> options) : DbCo
                 )
                 .IsRequired();
 
-            // Indexes to optimize common queries
             builder.HasIndex(e => e.TenantId);
             builder.HasIndex(e => e.DeviceId);
             builder.HasIndex(e => e.RecordedAt);
 
-            // SQLite doesn't support filtered unique indexes via EF migrations directly.
-            // Approach: enforce uniqueness in application logic/transaction.
-            // We'll add a regular index here; prefer adding the filtered-unique index in a migration with SQL for production.
             builder
                 .HasIndex(e => new { e.TenantId, e.ExternalId })
                 .HasDatabaseName("IX_TelemetryReadings_TenantId_ExternalId ");
