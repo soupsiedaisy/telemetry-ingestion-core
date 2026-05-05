@@ -80,28 +80,14 @@ public static class TelemetryEndpoints
                     CancellationToken ct
                 ) =>
                 {
-                    DateTimeOffset? fromParse = null;
-                    if (
-                        !string.IsNullOrEmpty(from) && DateTimeOffset.TryParse(from, out var fromDt)
-                    )
-                    {
-                        fromParse = fromDt;
-                    }
-
-                    DateTimeOffset? toParse = null;
-                    if (!string.IsNullOrEmpty(to) && DateTimeOffset.TryParse(to, out var toDt))
-                    {
-                        toParse = toDt;
-                    }
-
                     try
                     {
                         var results = await service.QueryReadingsAsync(
                             tenantId,
                             deviceId,
                             type,
-                            fromParse,
-                            toParse,
+                            from,
+                            to,
                             page,
                             pageSize,
                             ct

@@ -25,8 +25,8 @@ public interface ITelemetryService
     /// <param name="tenantId">The TelemetryReading tenantId to filter the responses with. Optional.</param>
     /// <param name="deviceId">The TelemetryReading deviceId to filter the responses with. Optional.</param>
     /// <param name="type">The TelemetryReading type to filter the responses with. Optional.</param>
-    /// <param name="from">A 'from' date to filter the TelemetryReading responses with, based on the recordedAt property. Optional.</param>
-    /// <param name="to">A 'to' date to filter the TelemetryReading responses with, based on the recordedAt property. Optional.</param>
+    /// <param name="from">A 'from' date to filter the TelemetryReading responses with, based on the recordedAt property. Parsed into a DateTimeOffset object. Optional.</param>
+    /// <param name="to">A 'to' date to filter the TelemetryReading responses with, based on the recordedAt property. Parsed into a DateTimeOffset object. Optional.</param>
     /// <param name="page">The page number for pagination. Optional.</param>
     /// <param name="pageSize">The pageSize for pagination. Optional.</param>
     /// <param name="ct">The CancellationToken for the operation.</param>
@@ -35,8 +35,8 @@ public interface ITelemetryService
         string? tenantId = null,
         string? deviceId = null,
         string? type = null,
-        DateTimeOffset? from = null,
-        DateTimeOffset? to = null,
+        string? from = null,
+        string? to = null,
         int? page = 1,
         int? pageSize = 50,
         CancellationToken ct = default

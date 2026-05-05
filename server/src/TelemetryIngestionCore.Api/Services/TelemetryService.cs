@@ -73,22 +73,59 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
         string? tenantId = null,
         string? deviceId = null,
         string? type = null,
-        DateTimeOffset? from = null,
-        DateTimeOffset? to = null,
+        string? from = null,
+        string? to = null,
         int? page = null,
         int? pageSize = null,
         CancellationToken ct = default
     )
     {
-        if (pageSize > maxPageSize)
+        if (!string.IsNullOrEmpty(tenantId) && tenantId.Length > 200)
         {
             throw new ArgumentException(
-                $"Page size of {pageSize} is greater than configured max page size of {maxPageSize}"
+                "Tenant Id of length greater than 200 characters is invalid"
             );
         }
 
+        if (!string.IsNullOrEmpty(deviceId) && deviceId.Length > 200)
+        {
+            throw new ArgumentException(
+                "Device Id of length greater than 200 characters is invalid"
+            );
+        }
+
+        if (!string.IsNullOrEmpty(type) && type.Length > 200)
+        {
+            throw new ArgumentException("Type of length greater than 200 characters is invalid");
+        }
+
+        DateTimeOffset? fromParse = null;
+        if (!string.IsNullOrEmpty(from))
+        {
+            fromParse = DateTimeOffset.Parse(from);
+        }
+
+        DateTimeOffset? toParse = null;
+        if (!string.IsNullOrEmpty(to))
+        {
+            toParse = DateTimeOffset.Parse(to);
+        }
+
+        if (pageSize.HasValue && pageSize > maxPageSize)
+        {
+            throw new ArgumentException(
+                $"Page size of '{pageSize}' is greater than configured max page size of '{maxPageSize}'"
+            );
+        }
+
+        if (pageSize.HasValue && pageSize < 1)
+            throw new ArgumentException($"Page size of '{pageSize}' is invalid");
+
+        if (page.HasValue && page < 1)
+            throw new ArgumentException($"Page number of '{page}' is invalid");
+
         var readings = await repository
-            .QueryAsync(tenantId, deviceId, type, from, to, page, pageSize, ct)
+            .QueryAsync(tenantId, deviceId, type, fromParse, toParse, page, pageSize, ct)
             .ConfigureAwait(false);
 
         return [.. readings.Select(MapToView)];
