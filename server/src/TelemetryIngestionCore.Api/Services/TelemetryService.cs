@@ -3,13 +3,15 @@ using System.Globalization;
 using Microsoft.Extensions.Options;
 using TelemetryIngestionCore.Api.Configuration;
 using TelemetryIngestionCore.Api.Data;
+using TelemetryIngestionCore.Api.Exceptions;
 using TelemetryIngestionCore.Api.Models;
 
 namespace TelemetryIngestionCore.Api.Services;
 
 /// <param name="repository">The TelemetryRepository injected by the program.</param>
 /// <inheritdoc cref="ITelemetryService" />
-public class TelemetryService(ITelemetryRepository repository) : ITelemetryService
+public class TelemetryService(ITelemetryRepository repository, ILogger<TelemetryService> logger)
+    : ITelemetryService
 {
     /// <summary>
     /// The threshold used for calculating the batteryLow status object.
@@ -26,8 +28,12 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
     /// </summary>
     /// <param name="repository">The TelemetryRepository injected by the program.</param>
     /// <param name="options">The IOptions app options injected by the program.</param>
-    public TelemetryService(ITelemetryRepository repository, IOptions<AppOptions> options)
-        : this(repository)
+    public TelemetryService(
+        ITelemetryRepository repository,
+        ILogger<TelemetryService> logger,
+        IOptions<AppOptions> options
+    )
+        : this(repository, logger)
     {
         batteryLowThreshold = options.Value.BatteryLowThreshold;
         maxPageSize = options.Value.MaxPageSize;
@@ -41,11 +47,42 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
     )
     {
         if (dto == null)
+        {
+            logger.LogError("CreateReadingAsync called with null dto");
+
             throw new ArgumentNullException(nameof(dto));
+        }
 
-        var validationContext = new ValidationContext(dto, serviceProvider: null, items: null);
+        try
+        {
+            var validationContext = new ValidationContext(dto, serviceProvider: null, items: null);
 
-        Validator.ValidateObject(dto, validationContext, validateAllProperties: true);
+            Validator.ValidateObject(dto, validationContext, validateAllProperties: true);
+        }
+        catch (ValidationException vex)
+        {
+            logger.LogWarning(
+                vex,
+                "CreateReadingAsync called with invalid DTO for TenantId={TenantId}, DeviceId={DeviceId}, ExternalId={ExternalId}",
+                dto.TenantId,
+                dto.DeviceId,
+                dto.ExternalId
+            );
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "CreateReadingAsync threw an exception with TenantId={TenantId}, DeviceId={DeviceId}, ExternalId={ExternalId}",
+                dto.TenantId,
+                dto.DeviceId,
+                dto.ExternalId
+            );
+
+            throw;
+        }
 
         var reading = new TelemetryReading
         {
@@ -62,7 +99,44 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
             CreatedAt = default,
         };
 
-        var created = await repository.CreateAsync(reading, ct).ConfigureAwait(false);
+        TelemetryReading? created;
+
+        // TODO this process can probably be abstracted
+        try
+        {
+            created = await repository.CreateAsync(reading, ct).ConfigureAwait(false);
+        }
+        catch (DuplicateExternalIdException dex)
+        {
+            logger.LogError(
+                dex,
+                "CreateReadingAsync called with duplicate ExternalId={ExternalId} for TenantId={TenantId}, with DeviceId={DeviceId}",
+                dto.TenantId,
+                dto.DeviceId,
+                dto.ExternalId
+            );
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "CreateReadingAsync threw an exception with TenantId={TenantId}, DeviceId={DeviceId}, ExternalId={ExternalId}",
+                dto.TenantId,
+                dto.DeviceId,
+                dto.ExternalId
+            );
+
+            throw;
+        }
+
+        logger.LogInformation(
+            "CreateReadingAsync created a reading with TenantId={TenantId}, DeviceId={DeviceId}, ExternalId={ExternalId}",
+            dto.TenantId,
+            dto.DeviceId,
+            dto.ExternalId
+        );
 
         return MapToView(created);
     }
@@ -80,8 +154,15 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
         CancellationToken ct = default
     )
     {
+        // TODO put this all in a validator
+
         if (!string.IsNullOrEmpty(tenantId) && tenantId.Length > 200)
         {
+            logger.LogWarning(
+                "QueryReadingsAsync called with invalid tenantId={tenantId} query parameter",
+                tenantId
+            );
+
             throw new ArgumentException(
                 "Tenant Id of length greater than 200 characters is invalid"
             );
@@ -89,6 +170,11 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
 
         if (!string.IsNullOrEmpty(deviceId) && deviceId.Length > 200)
         {
+            logger.LogWarning(
+                "QueryReadingsAsync called with invalid deviceId={deviceId} query parameter",
+                deviceId
+            );
+
             throw new ArgumentException(
                 "Device Id of length greater than 200 characters is invalid"
             );
@@ -96,37 +182,100 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
 
         if (!string.IsNullOrEmpty(type) && type.Length > 200)
         {
+            logger.LogWarning(
+                "QueryReadingsAsync called with invalid type={type} query parameter",
+                type
+            );
+
             throw new ArgumentException("Type of length greater than 200 characters is invalid");
         }
 
         DateTimeOffset? fromParse = null;
+
         if (!string.IsNullOrEmpty(from))
         {
-            fromParse = DateTimeOffset.Parse(from);
+            try
+            {
+                fromParse = DateTimeOffset.Parse(from);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(
+                    ex,
+                    "QueryReadingsAsync called with invalid from={from} query parameter",
+                    from
+                );
+
+                throw;
+            }
         }
 
         DateTimeOffset? toParse = null;
+
         if (!string.IsNullOrEmpty(to))
         {
-            toParse = DateTimeOffset.Parse(to);
+            try
+            {
+                toParse = DateTimeOffset.Parse(to);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(
+                    ex,
+                    "QueryReadingsAsync called with invalid to={to} query parameter",
+                    to
+                );
+
+                throw;
+            }
         }
 
         if (pageSize.HasValue && pageSize > maxPageSize)
         {
+            logger.LogWarning(
+                "QueryReadingsAsync called with invalid pageSize={pageSize} query parameter",
+                pageSize
+            );
+
             throw new ArgumentException(
                 $"Page size of '{pageSize}' is greater than configured max page size of '{maxPageSize}'"
             );
         }
 
         if (pageSize.HasValue && pageSize < 1)
+        {
+            logger.LogWarning(
+                "QueryReadingsAsync called with invalid pageSize={pageSize} query parameter",
+                pageSize
+            );
+
             throw new ArgumentException($"Page size of '{pageSize}' is invalid");
+        }
 
         if (page.HasValue && page < 1)
-            throw new ArgumentException($"Page number of '{page}' is invalid");
+        {
+            logger.LogWarning(
+                "QueryReadingsAsync called with invalid page={page} query parameter",
+                page
+            );
 
-        var response = await repository
-            .QueryAsync(tenantId, deviceId, type, fromParse, toParse, page, pageSize, ct)
-            .ConfigureAwait(false);
+            throw new ArgumentException($"Page number of '{page}' is invalid");
+        }
+
+        TelemetryReadingsPaginationData? response;
+
+        try
+        {
+            response = await repository
+                .QueryAsync(tenantId, deviceId, type, fromParse, toParse, page, pageSize, ct)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "QueryReadingsAsync threw an exception");
+
+            throw;
+        }
 
         return new TelemetryPaginationView
         {
