@@ -50,4 +50,28 @@ public class TelemetryDtoValidationTests
         Assert.False(isValid);
         Assert.Contains(results, r => r.MemberNames.Contains(nameof(dto.Battery)));
     }
+
+    [Fact]
+    public void Signal_OutOfRange_FailsValidation()
+    {
+        var dto = CreateValidDto();
+        dto.Signal = 1; // out of [-200,0]
+
+        var isValid = Validate(dto, out var results);
+
+        Assert.False(isValid);
+        Assert.Contains(results, r => r.MemberNames.Contains(nameof(dto.Signal)));
+    }
+
+    [Fact]
+    public void TenantId_OutsideMaxLength_FailsValidation()
+    {
+        var dto = CreateValidDto();
+        dto.TenantId = string.Concat(Enumerable.Repeat("a", 201)); // outside of max length of 200
+
+        var isValid = Validate(dto, out var results);
+
+        Assert.False(isValid);
+        Assert.Contains(results, r => r.MemberNames.Contains(nameof(dto.TenantId)));
+    }
 }
