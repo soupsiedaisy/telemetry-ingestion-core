@@ -57,7 +57,7 @@ public class TelemetryRepository(TelemetryContext context, IOptions<AppOptions> 
     }
 
     /// <inheritdoc cref="ITelemetryRepository.QueryAsync(string?, string?, string?, DateTimeOffset?, DateTimeOffset?, int?, int?, CancellationToken)" />
-    public async Task<IReadOnlyList<TelemetryReading>> QueryAsync(
+    public async Task<TelemetryReadingsPaginationData> QueryAsync(
         string? tenantId = null,
         string? deviceId = null,
         string? type = null,
@@ -94,11 +94,26 @@ public class TelemetryRepository(TelemetryContext context, IOptions<AppOptions> 
 
         var skip = (pageValue - 1) * pageSizeValue;
 
-        return await query
+        var readings = await query
             .OrderByDescending(reading => reading.RecordedAt)
             .Skip(skip)
             .Take(pageSizeValue)
             .ToListAsync(ct)
             .ConfigureAwait(false);
+
+        var count = await context.TelemetryReadings.CountAsync().ConfigureAwait(false);
+
+        var pageCount = (int)Math.Ceiling((double)count / pageSizeValue);
+
+        return new TelemetryReadingsPaginationData
+        {
+            TelemetryReadings = readings,
+            PaginationMetadata = new PaginationMetadata
+            {
+                PageCount = pageCount,
+                PageNumber = pageValue,
+                PageSize = pageSizeValue,
+            },
+        };
     }
 }

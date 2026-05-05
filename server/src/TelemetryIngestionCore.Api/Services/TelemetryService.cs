@@ -69,7 +69,7 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
 
     /// <exception cref="ArgumentException">The exception thrown when the method is passed a pageSize greater than the maximum configured page size.</exception>
     /// <inheritdoc cref="ITelemetryService.QueryReadingsAsync(string?, string?, string?, DateTimeOffset?, DateTimeOffset?, int?, int?, CancellationToken)" />
-    public async Task<IReadOnlyList<TelemetryView>> QueryReadingsAsync(
+    public async Task<TelemetryPaginationView> QueryReadingsAsync(
         string? tenantId = null,
         string? deviceId = null,
         string? type = null,
@@ -124,11 +124,15 @@ public class TelemetryService(ITelemetryRepository repository) : ITelemetryServi
         if (page.HasValue && page < 1)
             throw new ArgumentException($"Page number of '{page}' is invalid");
 
-        var readings = await repository
+        var response = await repository
             .QueryAsync(tenantId, deviceId, type, fromParse, toParse, page, pageSize, ct)
             .ConfigureAwait(false);
 
-        return [.. readings.Select(MapToView)];
+        return new TelemetryPaginationView
+        {
+            TelemetryReadings = [.. response.TelemetryReadings.Select(MapToView)],
+            PaginationMetadata = response.PaginationMetadata,
+        };
     }
 
     /// <summary>

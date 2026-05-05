@@ -143,7 +143,7 @@ public class TelemetryRepositoryTests : IDisposable
 
         var results = await repo.QueryAsync();
 
-        Assert.Empty(results);
+        Assert.Empty(results.TelemetryReadings);
     }
 
     [Fact]
@@ -153,7 +153,9 @@ public class TelemetryRepositoryTests : IDisposable
 
         var repo = CreateRepository(context);
 
-        var now = DateTimeOffset.FromUnixTimeMilliseconds(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        var now = DateTimeOffset.FromUnixTimeMilliseconds(
+            DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+        );
 
         var readings = new[]
         {
@@ -240,14 +242,17 @@ public class TelemetryRepositoryTests : IDisposable
             to: toFilter
         );
 
-        Assert.All(results, r => Assert.Equal(tenantIdFilter, r.TenantId));
-        Assert.All(results, r => Assert.Equal(deviceIdFilter, r.DeviceId));
-        Assert.All(results, r => Assert.Equal(typeFilter, r.Type));
+        Assert.All(results.TelemetryReadings, r => Assert.Equal(tenantIdFilter, r.TenantId));
+        Assert.All(results.TelemetryReadings, r => Assert.Equal(deviceIdFilter, r.DeviceId));
+        Assert.All(results.TelemetryReadings, r => Assert.Equal(typeFilter, r.Type));
         Assert.All(
-            results,
+            results.TelemetryReadings,
             r => Assert.True(DateTimeOffset.Compare(fromFilter, r.RecordedAt) <= 0)
         );
-        Assert.All(results, r => Assert.True(DateTimeOffset.Compare(r.RecordedAt, toFilter) <= 0));
+        Assert.All(
+            results.TelemetryReadings,
+            r => Assert.True(DateTimeOffset.Compare(r.RecordedAt, toFilter) <= 0)
+        );
     }
 
     [Fact]
@@ -284,7 +289,11 @@ public class TelemetryRepositoryTests : IDisposable
 
         var results = await repo.QueryAsync(page: 3, pageSize: 2);
 
-        Assert.Equal(2, results.Count);
-        Assert.All(results, r => Assert.Equal("page3", r.DeviceId));
+        Assert.Equal(2, results.TelemetryReadings.Count);
+        Assert.All(results.TelemetryReadings, r => Assert.Equal("page3", r.DeviceId));
+
+        Assert.Equal(4, results.PaginationMetadata.PageCount);
+        Assert.Equal(3, results.PaginationMetadata.PageNumber);
+        Assert.Equal(2, results.PaginationMetadata.PageSize);
     }
 }

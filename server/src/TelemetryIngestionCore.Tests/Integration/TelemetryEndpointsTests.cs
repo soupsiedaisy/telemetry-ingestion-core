@@ -66,12 +66,12 @@ public class TelemetryEndpointsTests : IClassFixture<TelemetryWebApplicationFact
 
         Assert.Equal(HttpStatusCode.OK, queryResp.StatusCode);
 
-        var list = await queryResp.Content.ReadFromJsonAsync<TelemetryView[]>();
+        var data = await queryResp.Content.ReadFromJsonAsync<TelemetryPaginationView>();
 
-        Assert.NotNull(list);
+        Assert.NotNull(data.TelemetryReadings);
 
         Assert.Single(
-            list,
+            data.TelemetryReadings,
             v =>
                 dto.TenantId == v.TenantId
                 && dto.ExternalId == v.ExternalId
@@ -82,6 +82,8 @@ public class TelemetryEndpointsTests : IClassFixture<TelemetryWebApplicationFact
                 && dto.Battery == v.Battery
                 && dto.Signal == v.Signal
         );
+
+        Assert.Equal(1, data.PaginationMetadata.PageCount);
     }
 
     [Fact(DisplayName = "Failure flow - create with invalid DTO returns validation problem")]

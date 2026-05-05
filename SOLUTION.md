@@ -110,9 +110,12 @@ Each Backend, DB and CI/CD section will outline its implementations and consider
 │       │   │   ├── <Date>_<Migration>.Designer.cs # Generated migration
 │       │   │   └── TelemetryContextModelSnapshot.cs # Generated snapshot
 │       │   ├── Models
-│       │   │   ├── TelemetryDto.cs # Telemetry ingest DTO
-│       │   │   ├── TelemetryReading.cs # EF entity
-│       │   │   └── TelemetryView.cs # Query response DTO
+│       │   │   ├── PaginationMetadata.cs
+│       │   │   ├── TelemetryDto.cs
+│       │   │   ├── TelemetryPaginationView.cs
+│       │   │   ├── TelemetryReading.cs
+│       │   │   ├── TelemetryReadingsPaginationData.cs
+│       │   │   └── TelemetryView.cs
 │       │   ├── Properties
 │       │   │   └── launchSettings.json
 │       │   ├── Services
@@ -162,7 +165,7 @@ This section outlines the models used throughout the service
 
 #### Data Models
 
-The following data models are used for the EF context, reading ingestion and query response, respectively. For the sake of brevity, only the TelemetryReading model will show descriptions for each property. The models following inherit the same descriptions.
+The following data models are used for the EF context, reading ingestion and query response, respectively. For the sake of brevity, only the TelemetryReading model will show descriptions for each property. The models TelemetryDto and TelemetryView following inherit the same descriptions.
 
 TelemetryReading (EF entity)
 
@@ -203,6 +206,20 @@ TelemetryView (View model for responses)
 - `Signal: int`
 - `RecordedAt: DateTimeOffset`
 - `CreatedAt: DateTimeOffset`
+
+PaginationMetadata (Model for information about pagination)
+
+- `PageNumber: int` - The current page number of the pagination.
+- `PageCount: int` - The total number of pages available.
+- `PageSize: int` - The page size of the pagination.
+
+TelemetryPaginationView (Model for responses that contain telemetry readings and pagination)
+- `TelemetryReadings: IEnumerable<TelemetryView>` - The queried telemetry readings.
+- `PaginationMetadata: PaginationMetadata` - Metadata about pagination.
+
+TelemetryReadingsPaginationData (Model for the repository to return telemetry readings and pagination data)
+- `TelemetryReadings: IReadOnlyList<TelemetryReading>` - The queried telemetry readings.
+- `PaginationMetadata: PaginationMetadata` - Metadata about pagination.
 
 ##### Considerations
 

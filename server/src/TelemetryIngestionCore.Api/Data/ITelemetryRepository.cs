@@ -29,8 +29,8 @@ public interface ITelemetryRepository
     /// <param name="page">The page number for pagination. Optional.</param>
     /// <param name="pageSize">The pageSize for pagination. Optional.</param>
     /// <param name="ct">The CancellationToken for the operation.</param>
-    /// <returns>The queried TelemetryReading entries.</returns>
-    public abstract Task<IReadOnlyList<TelemetryReading>> QueryAsync(
+    /// <returns>The queried TelemetryReading entries and pagination metadata.</returns>
+    public abstract Task<TelemetryReadingsPaginationData> QueryAsync(
         string? tenantId = null,
         string? deviceId = null,
         string? type = null,
