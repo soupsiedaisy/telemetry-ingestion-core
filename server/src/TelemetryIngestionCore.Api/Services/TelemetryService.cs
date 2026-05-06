@@ -272,10 +272,31 @@ public class TelemetryService(ITelemetryRepository repository, ILogger<Telemetry
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "QueryReadingsAsync threw an exception");
+            logger.LogError(
+                ex,
+                "QueryReadingsAsync threw an exception with parameters tenantId={tenantId}, deviceId={deviceId}, type={type}, from={from}, to={to}, page={page}, pageSize={pageSize}",
+                tenantId,
+                deviceId,
+                type,
+                from,
+                to,
+                page,
+                pageSize
+            );
 
             throw;
         }
+
+        logger.LogInformation(
+            "QueryReadingsAsync queried readings with parameters tenantId={tenantId}, deviceId={deviceId}, type={type}, from={from}, to={to}, page={page}, pageSize={pageSize}",
+            tenantId,
+            deviceId,
+            type,
+            from,
+            to,
+            page,
+            pageSize
+        );
 
         return new TelemetryPaginationView
         {
