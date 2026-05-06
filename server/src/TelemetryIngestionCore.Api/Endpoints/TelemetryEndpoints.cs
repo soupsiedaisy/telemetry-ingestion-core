@@ -105,7 +105,7 @@ public static class TelemetryEndpoints
                 }
             )
             .WithName("QueryTelemetry")
-            .Produces<IEnumerable<TelemetryView>>(statusCode: 200)
+            .Produces<TelemetryPaginationView>(statusCode: 200)
             .Produces(400)
             .Produces(500);
 
